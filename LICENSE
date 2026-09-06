@@ -1,0 +1,15 @@
+kde-fui-theme
+
+Copyright (c) 2026 kobago
+
+Scripts (build.py, install.sh, apply.sh, restore.sh) and the generated theme
+packages (colour schemes, Plasma desktop theme, Aurorae decoration,
+look-and-feel package, terminal colour schemes) are released under the
+GNU General Public License, version 2 or (at your option) any later version.
+See https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+The generated wallpapers are released under CC0 1.0.
+
+The fonts in fonts/ are third-party works under the SIL Open Font License 1.1;
+see fonts/README.md and the OFL-*.txt files there. The derived font "FUI Mono"
+produced by build.py is also distributed under the OFL 1.1.
