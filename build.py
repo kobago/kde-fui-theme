@@ -4,7 +4,7 @@
 One palette (tokens) -> every artefact:
   dist/color-schemes/FUI<Name>.colors            KDE colour scheme (Qt / Breeze / GTK bridge)
   dist/plasma/desktoptheme/fui-<name>/           Plasma desktop theme (panel, popups, tooltips, ...)
-  dist/aurorae/themes/FUI-<Name>/                Aurorae window decoration (square, glow border)
+  dist/aurorae/themes/FUI-<Name>/                Aurorae window decoration (square, 1px frame)
   dist/wallpapers/FUI-<Name>/                    Wallpaper package (grid + scanlines)
   dist/plasma/look-and-feel/org.kobago.fui.<name>/  Global theme tying everything together
   dist/konsole/FUI-<Name>.colorscheme            Konsole colour scheme
@@ -791,12 +791,39 @@ def font_settings() -> dict:
 
 # --------------------------------------------------------------------------- look-and-feel
 def preview_svg(p: Pal, w=1280, h=720):
+    """Global-theme preview drawn from the real theme geometry: 1px frame, no glow, 36px title bar with
+    Orbitron caption on the left and line-drawn buttons on the right, Dolphin-like contents, FUI panel."""
     a, d, t, td = p.h("accent"), p.h("accent_dim"), p.h("text"), p.h("text_dim")
-    bg = p.h("bg_deep")
-    glow = "".join(
-        f'<rect x="{240 - e:g}" y="{120 - e:g}" width="{800 + 2 * e:g}" height="{440 + 2 * e:g}" '
-        f'style="fill:none;stroke:{a};stroke-opacity:{al};stroke-width:{2 * e:g}"/>'
-        for e, al in reversed(GLOW))
+    bg, bgp, dn = p.h("bg_deep"), p.h("bg_panel"), p.h("danger")
+    sans = "'Noto Sans','Noto Sans CJK JP',sans-serif"
+    X, Y, W, H = 200, 60, 880, 560               # window frame
+    TB = 36                                       # title bar
+    rows = [("OFL-Orbitron.txt", "4.3 KiB", "43 分前"), ("OFL-ShareTechMono.txt", "4.3 KiB", "43 分前"),
+            ("Orbitron[wght].ttf", "37.7 KiB", "43 分前"), ("ShareTechMono-Regular.ttf", "42.3 KiB", "43 分前")]
+    places = ["ホーム", "デスクトップ", "ドキュメント", "ダウンロード", "音楽", "画像", "ビデオ", "ごみ箱"]
+
+    def glyph(cx, cy, kind, color):
+        if kind == "min":
+            return f'<path d="M{cx - 5},{cy} H{cx + 5}" style="fill:none;stroke:{color};stroke-width:1.5"/>'
+        if kind == "max":
+            return f'<rect x="{cx - 4.5}" y="{cy - 4.5}" width="9" height="9" style="fill:none;stroke:{color};stroke-width:1.5"/>'
+        return (f'<path d="M{cx - 5},{cy - 5} L{cx + 5},{cy + 5} M{cx + 5},{cy - 5} L{cx - 5},{cy + 5}" '
+                f'style="fill:none;stroke:{color};stroke-width:1.5"/>')
+
+    file_rows = ""
+    for i, (name, size, date) in enumerate(rows):
+        ry = Y + TB + 94 + i * 30
+        if i == 0:   # selected row: accent 0.35 fill + 1px accent frame (widgets/viewitem selected)
+            file_rows += (f'<rect x="{X + 200}" y="{ry - 19}" width="{W - 212}" height="26" '
+                          f'style="fill:{a};fill-opacity:0.35;stroke:{a};stroke-width:1"/>')
+        file_rows += (f'<path d="M{X + 214},{ry - 14} h10 v18 h-10 z" style="fill:none;stroke:{td};stroke-width:1"/>'
+                      f'<text x="{X + 234}" y="{ry}" style="font-family:{sans};font-size:13px;fill:{t}">{name}</text>'
+                      f'<text x="{X + 640}" y="{ry}" text-anchor="end" style="font-family:{sans};font-size:13px;fill:{td}">{size}</text>'
+                      f'<text x="{X + 660}" y="{ry}" style="font-family:{sans};font-size:13px;fill:{td}">{date}</text>')
+    place_rows = "".join(
+        f'<text x="{X + 30}" y="{Y + TB + 72 + i * 26}" style="font-family:{sans};font-size:13px;fill:{t}">{s}</text>'
+        f'<rect x="{X + 12}" y="{Y + TB + 60 + i * 26}" width="11" height="11" style="fill:none;stroke:{td};stroke-width:1"/>'
+        for i, s in enumerate(places))
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
 <defs>
@@ -804,44 +831,44 @@ def preview_svg(p: Pal, w=1280, h=720):
     <path d="M48,0 H0 V48" style="fill:none;stroke:{d};stroke-width:1;stroke-opacity:0.10"/></pattern>
   <pattern id="major" width="240" height="240" patternUnits="userSpaceOnUse">
     <path d="M240,0 H0 V240" style="fill:none;stroke:{d};stroke-width:1;stroke-opacity:0.22"/></pattern>
-  <pattern id="scan" width="1" height="3" patternUnits="userSpaceOnUse">
-    <rect y="2" width="1" height="1" style="fill:#000000;fill-opacity:0.10"/></pattern>
 </defs>
 <rect width="{w}" height="{h}" style="fill:{bg}"/>
 <rect width="{w}" height="{h}" style="fill:url(#minor)"/>
 <rect width="{w}" height="{h}" style="fill:url(#major)"/>
-<!-- window -->
-{glow}
-<rect x="240" y="120" width="800" height="440" style="fill:{bg};fill-opacity:{BG_ALPHA};stroke:{a};stroke-width:1.4"/>
-<line x1="240.5" y1="156.5" x2="1039.5" y2="156.5" style="stroke:{d};stroke-width:1"/>
-<text x="254" y="144" style="font-family:Orbitron,sans-serif;font-weight:600;font-size:14px;letter-spacing:0.12em;fill:{a}">SYSTEM // CONSOLE</text>
-<path d="M990,132 H1000 M1010,132.5 H1019 V141.5 H1010 Z M1024,132 L1034,142 M1034,132 L1024,142" style="fill:none;stroke:{a};stroke-width:1.5"/>
-<path d="M1024,132 L1034,142 M1034,132 L1024,142" style="fill:none;stroke:{p.h('danger')};stroke-width:1.5"/>
-<rect x="254" y="172" width="180" height="24" style="fill:{a};fill-opacity:0.13;stroke:{a};stroke-width:1"/>
-<rect x="254" y="172" width="3" height="24" style="fill:{a}"/>
-<text x="272" y="189" style="font-family:Orbitron,sans-serif;font-size:11px;letter-spacing:0.12em;fill:{a}">TELEMETRY</text>
-<rect x="254" y="204" width="180" height="24" style="fill:{bg};fill-opacity:0.5;stroke:{a};stroke-opacity:0.22;stroke-width:1"/>
-<rect x="254" y="204" width="3" height="24" style="fill:{d};fill-opacity:0.4"/>
-<text x="272" y="221" style="font-family:Orbitron,sans-serif;font-size:11px;letter-spacing:0.12em;fill:{t};fill-opacity:0.8">MODULES</text>
-<rect x="450" y="172" width="574" height="300" style="fill:{p.h('bg_panel')};fill-opacity:{PANEL_ALPHA};stroke:{d};stroke-opacity:0.8;stroke-width:1"/>
-<rect x="464" y="164" width="96" height="16" style="fill:{bg};stroke:{d};stroke-width:1"/>
-<text x="473" y="176" style="font-family:'Share Tech Mono',monospace;font-size:11px;fill:{a}">LINK STATUS</text>
-<g style="font-family:'Share Tech Mono',monospace;font-size:13px;fill:{td}">
-<text x="466" y="206">[T+00:12:34.5]</text><text x="590" y="206" style="fill:{t}">MODEL SYNC VERIFIED</text>
-<text x="466" y="228">[T+00:12:31.2]</text><text x="590" y="228" style="fill:{p.h('ok')}">LINK SECURE :: 4 CONTACTS</text>
-<text x="466" y="250">[T+00:12:20.9]</text><text x="590" y="250" style="fill:{p.h('warn')}">DRIFT 0.8 mm :: THRESHOLD 0.5</text>
-</g>
-{"".join(f'<rect x="{466 + i * 9}" y="290" width="7" height="12" style="fill:{a};fill-opacity:{0.25 + 0.75 * i / 17:.2f}"/>' if i / 17 <= 0.72 else f'<rect x="{466 + i * 9}" y="290" width="7" height="12" style="fill:{d};fill-opacity:0.15"/>' for i in range(18))}
-<text x="640" y="301" style="font-family:'Share Tech Mono',monospace;font-size:13px;fill:{t}"> 72.0 %</text>
-<text x="700" y="301" style="font-family:'Share Tech Mono',monospace;font-size:11px;fill:{td}">POWER</text>
-<!-- panel -->
-<rect x="0" y="676" width="{w}" height="44" style="fill:{bg};fill-opacity:{BG_ALPHA}"/>
-<line x1="0" y1="676.5" x2="{w}" y2="676.5" style="stroke:{d};stroke-width:1"/>
-<rect x="120" y="684" width="120" height="28" style="fill:{a};fill-opacity:0.16"/>
-<rect x="120" y="710" width="120" height="2" style="fill:{a}"/>
-<rect x="250" y="684" width="120" height="28" style="fill:none"/>
-<rect x="250" y="710" width="120" height="2" style="fill:{d};fill-opacity:0.8"/>
-<text x="{w - 24}" y="703" text-anchor="end" style="font-family:'Share Tech Mono',monospace;font-size:14px;fill:{t}">12:34</text>
+<!-- window: Aurorae FUI decoration (1px accent frame, no glow) -->
+<rect x="{X}" y="{Y}" width="{W}" height="{H}" style="fill:{bgp};stroke:none"/>
+<rect x="{X}" y="{Y}" width="{W}" height="{TB}" style="fill:{bg};fill-opacity:{BG_ALPHA}"/>
+<line x1="{X}" y1="{Y + TB - 0.5}" x2="{X + W}" y2="{Y + TB - 0.5}" style="stroke:{d};stroke-width:1"/>
+<rect x="{X + 0.5}" y="{Y + 0.5}" width="{W - 1}" height="{H - 1}" style="fill:none;stroke:{a};stroke-width:1"/>
+<rect x="{X + 16}" y="{Y + 10}" width="16" height="16" style="fill:{a};fill-opacity:0.25;stroke:{a};stroke-width:1"/>
+<text x="{X + 46}" y="{Y + 23}" style="font-family:Orbitron,sans-serif;font-weight:600;font-size:13px;letter-spacing:0.12em;fill:{a}">FONTS — DOLPHIN</text>
+{glyph(X + W - 82, Y + 18, "min", a)}{glyph(X + W - 50, Y + 18, "max", a)}{glyph(X + W - 18, Y + 18, "close", dn)}
+<!-- toolbar / breadcrumb -->
+<line x1="{X}" y1="{Y + TB + 40}" x2="{X + W}" y2="{Y + TB + 40}" style="stroke:{d};stroke-opacity:0.6;stroke-width:1"/>
+<text x="{X + 210}" y="{Y + TB + 26}" style="font-family:{sans};font-size:13px;fill:{t}">ホーム &gt; projects &gt; kde-fui-theme &gt; fonts</text>
+<text x="{X + 14}" y="{Y + TB + 26}" style="font-family:{sans};font-size:12px;fill:{td}">場所</text>
+<line x1="{X + 200}" y1="{Y + TB}" x2="{X + 200}" y2="{Y + H}" style="stroke:{d};stroke-opacity:0.6;stroke-width:1"/>
+{place_rows}
+<!-- column header -->
+<rect x="{X + 200}" y="{Y + TB + 40}" width="{W - 200}" height="24" style="fill:{bg};fill-opacity:0.6"/>
+<text x="{X + 234}" y="{Y + TB + 57}" style="font-family:{sans};font-size:13px;fill:{t}">名前</text>
+<text x="{X + 560}" y="{Y + TB + 57}" style="font-family:{sans};font-size:13px;fill:{t}">サイズ</text>
+<text x="{X + 660}" y="{Y + TB + 57}" style="font-family:{sans};font-size:13px;fill:{t}">更新日</text>
+<line x1="{X + 200}" y1="{Y + TB + 64.5}" x2="{X + W}" y2="{Y + TB + 64.5}" style="stroke:{d};stroke-width:1"/>
+{file_rows}
+<!-- status bar -->
+<text x="{X + 214}" y="{Y + H - 14}" style="font-family:{sans};font-size:12px;fill:{td}">4 ファイル (88.0 KiB)</text>
+<!-- panel: widgets/panel-background (1px accent_dim border) + task indicator line -->
+<rect x="0" y="{h - 44}" width="{w}" height="44" style="fill:{bg};fill-opacity:{BG_ALPHA}"/>
+<line x1="0" y1="{h - 43.5}" x2="{w}" y2="{h - 43.5}" style="stroke:{d};stroke-width:1"/>
+<rect x="14" y="{h - 32}" width="20" height="20" style="fill:{a};fill-opacity:0.25;stroke:{a};stroke-width:1"/>
+<rect x="60" y="{h - 40}" width="180" height="36" style="fill:{a};fill-opacity:0.16"/>
+<rect x="60" y="{h - 6}" width="180" height="2" style="fill:{a}"/>
+<text x="76" y="{h - 18}" style="font-family:{sans};font-size:13px;fill:{t}">fonts — Dolphin</text>
+<rect x="{w - 150}" y="{h - 34}" width="12" height="12" style="fill:none;stroke:{t};stroke-width:1"/>
+<rect x="{w - 130}" y="{h - 34}" width="12" height="12" style="fill:none;stroke:{t};stroke-width:1"/>
+<text x="{w - 20}" y="{h - 26}" text-anchor="end" style="font-family:{sans};font-size:13px;fill:{t}">13:37</text>
+<text x="{w - 20}" y="{h - 10}" text-anchor="end" style="font-family:{sans};font-size:11px;fill:{td}">2026/09/06</text>
 </svg>
 """
 
