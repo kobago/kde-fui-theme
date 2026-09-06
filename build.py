@@ -887,11 +887,19 @@ cursorTheme=breeze_cursors
 library=org.kde.kwin.aurorae
 theme=__aurorae__svg__{p.aurorae_id}
 """)
+    # KCM look-and-feel: thumbnail = previews/preview.png, full preview = previews/fullscreenpreview.jpg (JPEG, by name).
     svg = out / "contents/previews/preview.svg"
     write(svg, preview_svg(p))
     rsvg(svg, out / "contents/previews/preview.png")
-    rsvg(svg, out / "contents/previews/fullscreenpreview.png")
+    full_png = out / "contents/previews/fullscreenpreview.png"
+    rsvg(svg, full_png, 1920, 1080)
     svg.unlink()
+    try:
+        from PIL import Image  # type: ignore
+        Image.open(full_png).convert("RGB").save(out / "contents/previews/fullscreenpreview.jpg", quality=90)
+        full_png.unlink()
+    except Exception as e:
+        print(f"  ! could not write fullscreenpreview.jpg ({e}); the KCM will show the default preview")
 
 
 # --------------------------------------------------------------------------- terminals
