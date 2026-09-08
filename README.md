@@ -38,7 +38,7 @@ FUI Mono は Share Tech Mono の縦メトリクス (hhea / OS/2 の ascender・d
 
 `apply.sh` が触るもの: 配色、Plasma テーマ、ウィンドウ装飾 (kwinrc)、フォント 6 種 (kdeglobals)、壁紙、
 `LookAndFeelPackage`。パネルの配置やウィジェット構成には触らない。
-Ghostty 用の同じ配色は [ghostty-fui-theme](https://github.com/kobago/ghostty-fui-theme) に分けてある。
+Ghostty 用の同じ配色は [ghostty-fui-theme](https://github.com/kobago/ghostty-fuide-theme) に分けてある。
 システム設定 > 外観 > グローバルテーマ から「FUI Cyan」を選んでも同じものが適用できる。
 
 フォントの反映は `org.kde.KDEPlatformTheme.refreshFonts` の D-Bus シグナルで既存プロセスにも通知する
