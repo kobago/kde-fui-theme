@@ -5,12 +5,12 @@ CONF="${XDG_CONFIG_HOME:-$HOME/.config}"
 BACKUP="$CONF/kde-fui-theme/backup.ini"
 [ -e "$BACKUP" ] || { echo "no backup at $BACKUP" >&2; exit 1; }
 
-WALL=""; GHOSTTY=""
+WALL=""
 while IFS='=' read -r key val; do
   case "$key" in
     ''|'#'*) continue ;;
     wallpaper) WALL="$val"; continue ;;
-    ghostty_theme) GHOSTTY="$val"; continue ;;
+    ghostty_theme) continue ;;   # written by older versions (Ghostty moved to ghostty-fui-theme)
   esac
   IFS='/' read -r file group name <<< "$key"
   if [ -z "$val" ]; then
@@ -28,15 +28,6 @@ theme="$(kreadconfig6 --file plasmarc --group Theme --key name)"
 plasma-apply-desktoptheme "${theme:-default}" || true
 qdbus6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
 [ -n "$WALL" ] && [ -e "$WALL" ] && plasma-apply-wallpaperimage "$WALL" >/dev/null || true
-
-GH="$CONF/ghostty/config.ghostty"
-if [ -e "$GH" ]; then
-  if [ -n "$GHOSTTY" ]; then
-    sed -i -E "s|^\s*theme\s*=.*|theme = $GHOSTTY|" "$GH"
-  else
-    sed -i -E '/^\s*theme\s*=\s*fui-(cyan|amber|green)\s*$/d' "$GH"
-  fi
-fi
 
 mv "$BACKUP" "$BACKUP.restored"
 echo "restored. (backup kept as $BACKUP.restored)"

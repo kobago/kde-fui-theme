@@ -53,7 +53,6 @@ if [ ! -e "$BACKUP" ]; then
     done
     # first desktop wallpaper image found in the Plasma layout
     printf 'wallpaper=%s\n' "$(grep -m1 -E '^Image=' "$CONF/plasma-org.kde.plasma.desktop-appletsrc" 2>/dev/null | cut -d= -f2- || true)"
-    printf 'ghostty_theme=%s\n' "$(grep -m1 -E '^\s*theme\s*=' "$CONF/ghostty/config.ghostty" 2>/dev/null | sed -E 's/^\s*theme\s*=\s*//' || true)"
   } > "$BACKUP"
   echo "== backup written: $BACKUP"
 else
@@ -93,16 +92,6 @@ qdbus6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
 
 echo "== wallpaper"
 plasma-apply-wallpaperimage "$WALL" >/dev/null
-
-echo "== ghostty theme: $PLASMA"
-GH="$CONF/ghostty/config.ghostty"
-if [ -e "$GH" ]; then
-  if grep -qE '^\s*theme\s*=' "$GH"; then
-    sed -i -E "s|^\s*theme\s*=.*|theme = $PLASMA|" "$GH"
-  else
-    printf '\ntheme = %s\n' "$PLASMA" >> "$GH"
-  fi
-fi
 
 echo
 echo "applied FUI $NAME. Newly started apps pick up the fonts; running ones may need a restart."

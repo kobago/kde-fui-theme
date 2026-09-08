@@ -15,7 +15,6 @@ KDE Plasma 6 用の FUI (Futuristic UI) テーマ一式。暗い地 + 1 色の�
 | 壁紙 `FUI-{Cyan,Amber,Green}` | `~/.local/share/wallpapers/` | 地色 + 48px/240px グリッド + 走査線。3840×2160 / 2560×1440 |
 | グローバルテーマ `org.kobago.fui.{cyan,amber,green}` | `~/.local/share/plasma/look-and-feel/` | 上記 + フォントをまとめて適用する look-and-feel パッケージ |
 | Konsole `FUI{Cyan,Amber,Green}.colorscheme` | `~/.local/share/konsole/` | 端末配色 |
-| Ghostty `fui-{cyan,amber,green}` | `~/.config/ghostty/themes/` | 端末配色 (`theme = fui-cyan`) |
 | フォント Orbitron / Share Tech Mono / FUI Mono (OFL) | `~/.local/share/fonts/fui/` | ウィンドウタイトル = Orbitron (大文字・字間 +12 %)。UI 本文は既定では**システム標準のまま** (Breeze の Noto Sans / Hack)。`build.py` の `USE_FUI_MONO = True` にすると UI 本文も FUI Mono になる |
 
 UI 本文フォントは当初 FUI Mono にしていたが、既定の英字フォントに戻したいという要望で標準のままにした (`USE_FUI_MONO`)。
@@ -38,7 +37,8 @@ FUI Mono は Share Tech Mono の縦メトリクス (hhea / OS/2 の ascender・d
 ```
 
 `apply.sh` が触るもの: 配色、Plasma テーマ、ウィンドウ装飾 (kwinrc)、フォント 6 種 (kdeglobals)、壁紙、
-`LookAndFeelPackage`、Ghostty の `theme =` 行。パネルの配置やウィジェット構成には触らない。
+`LookAndFeelPackage`。パネルの配置やウィジェット構成には触らない。
+Ghostty 用の同じ配色は [ghostty-fui-theme](https://github.com/kobago/ghostty-fui-theme) に分けてある。
 システム設定 > 外観 > グローバルテーマ から「FUI Cyan」を選んでも同じものが適用できる。
 
 フォントの反映は `org.kde.KDEPlatformTheme.refreshFonts` の D-Bus シグナルで既存プロセスにも通知する
