@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build the FUI theme set and install it for the current user (no root needed).
-# Nothing is applied here; run ./apply.sh [cyan|amber|green] afterwards.
+# Nothing is applied here; run ./apply.sh [cyan|amber|green|breeze-cyan|breeze-amber|breeze-green] afterwards.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
@@ -32,11 +32,13 @@ kbuildsycoca6 --noincremental >/dev/null 2>&1 || true
 
 echo
 echo "installed:"
-echo "  colour schemes : $DATA/color-schemes/FUI{Cyan,Amber,Green}.colors"
+echo "  colour schemes : $DATA/color-schemes/{FUI,BreezeFUI}{Cyan,Amber,Green}.colors"
 echo "  plasma themes  : $DATA/plasma/desktoptheme/fui-{cyan,amber,green}"
 echo "  decorations    : $DATA/aurorae/themes/FUI-{Cyan,Amber,Green}"
 echo "  wallpapers     : $DATA/wallpapers/FUI-{Cyan,Amber,Green}"
-echo "  global themes  : $DATA/plasma/look-and-feel/org.kobago.fui.{cyan,amber,green}"
+echo "  global themes  : $DATA/plasma/look-and-feel/org.kobago.{fui,breezefui}.{cyan,amber,green}"
 echo "  konsole        : $DATA/konsole/FUI{Cyan,Amber,Green}.colorscheme"
 echo
-echo "next: ./apply.sh cyan   (backs up current settings; ./restore.sh puts them back)"
+echo "next: ./apply.sh cyan          full FUI"
+echo "      ./apply.sh breeze-cyan   Breeze Dark + FUI colours only"
+echo "      (both back up the current settings once; ./restore.sh puts them back)"

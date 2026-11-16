@@ -27,19 +27,41 @@ FUI Mono は Share Tech Mono の縦メトリクス (hhea / OS/2 の ascender・d
 読みにくい」と指摘された実例あり)。値は `build.py` の `MONO_ADVANCE_EM`。書体側で広げているので GTK / Chrome / Plasma QML
 にも同じ字間が効く。
 
+## Breeze FUI (控えめ版)
+
+FUI の装飾 (直角・発光枠・グロー・Orbitron タイトル・グリッド壁紙) が普段使いに合わない場合向けの、
+**Breeze Dark をそのまま使い、配色だけ FUI パレットに差し替えた**バリエーション。Breeze FUI Cyan / Amber / Green。
+
+| 項目 | FUI | Breeze FUI |
+|---|---|---|
+| 配色 | `FUI<Name>` | `BreezeFUI<Name>` (Breeze Dark と同じロール構成・明度段差で FUI の色相) |
+| Plasma テーマ | `fui-<name>` (直角・グロー・ブラー無効) | Breeze (`default`)。配色に追従する |
+| ウィンドウ装飾 | Aurorae `FUI-<Name>` | Breeze |
+| フォント | タイトル = Orbitron | すべてシステム標準 (適用前の値に戻す) |
+| 壁紙 | FUI グリッド | 適用前の壁紙のまま (グローバルテーマ経由なら Breeze 標準の Next) |
+| グローバルテーマ | `org.kobago.fui.<name>` | `org.kobago.breezefui.<name>` |
+
+`BreezeFUI<Name>.colors` の対応: View = bg_deep、Window = bg_panel、Button / Header / Tooltip = bg_panel を
+accent_dim 側へ 18 % 寄せた色 (FUI 版のようなアクセント色のボタンにはしない)、Selection = accent α0.45 の不透明色
++ ほぼ白の文字 (Breeze のチェックボックス・スライダー・進捗バーがはっきり見えるように)、Focus / Hover / Link = accent、
+Negative / Neutral / Positive = danger / warn / ok。システム設定でアクセントカラーを手動指定していると Selection は
+そちらで上書きされるので、「配色のアクセントカラーを使う」にしておく。
+
 ## 使い方
 
 ```sh
 ./install.sh          # フォント導入 → build.py → ~/.local 以下へコピー (root 不要)
 ./apply.sh cyan       # 適用。初回に元の設定を ~/.config/kde-fui-theme/backup.ini へ保存
 ./apply.sh amber      # パレット切替 (cyan / amber / green)
+./apply.sh breeze-cyan   # Breeze FUI (breeze-cyan / breeze-amber / breeze-green)
 ./restore.sh          # 適用前の設定に戻す
 ```
 
 `apply.sh` が触るもの: 配色、Plasma テーマ、ウィンドウ装飾 (kwinrc)、フォント 6 種 (kdeglobals)、壁紙、
 `LookAndFeelPackage`。パネルの配置やウィジェット構成には触らない。
 Ghostty 用の同じ配色は [ghostty-fui-theme](https://github.com/kobago/ghostty-fuide-theme) に分けてある。
-システム設定 > 外観 > グローバルテーマ から「FUI Cyan」を選んでも同じものが適用できる。
+システム設定 > 外観 > グローバルテーマ から「FUI Cyan」「Breeze FUI Cyan」を選んでも同じものが適用できる
+(配色だけ欲しい場合は 外観 > 色 で「Breeze FUI Cyan」を選ぶだけでもよい)。
 
 フォントの反映は `org.kde.KDEPlatformTheme.refreshFonts` の D-Bus シグナルで既存プロセスにも通知する
 (これが無いと KWin のタイトルフォントが更新されない)。
